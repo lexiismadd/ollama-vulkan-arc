@@ -1,0 +1,65 @@
+services:
+  ollama-vulkan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Update this to the latest Ollama version
+        OLLAMA_VERSION: v0.12.6
+    container_name: ollama-vulkan-arc
+    restart: unless-stopped
+    
+    # Map Intel Arc GPU into container
+    devices:
+      - /dev/dri:/dev/dri
+    
+    # Ports
+    ports:
+      - "11434:11434"
+    
+    # Volumes for persistent model storage
+    volumes:
+      - ollama-models:/root/.ollama
+    
+    # Environment variables for Intel Arc A770
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_NUM_GPU=999
+      - ZES_ENABLE_SYSMAN=1
+      # Optional: Set specific GPU if you have multiple
+      # - ONEAPI_DEVICE_SELECTOR=level_zero:0
+      # Optional: Adjust context window
+      # - OLLAMA_NUM_CTX=16384
+    
+    # Resource limits (adjust based on your system)
+    mem_limit: 32g
+    shm_size: 16g
+    
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Open WebUI for easy interaction
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama-vulkan:11434
+    depends_on:
+      ollama-vulkan:
+        condition: service_healthy
+
+volumes:
+  ollama-models:
+    driver: local
+  open-webui:
+    driver: local
