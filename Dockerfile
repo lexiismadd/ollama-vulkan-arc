@@ -33,7 +33,7 @@ ENV VULKAN_SDK=/usr
 
 # Clone Ollama repository
 WORKDIR /build
-ARG OLLAMA_VERSION=v0.12.6
+ARG OLLAMA_VERSION=v0.12.7
 RUN git clone --depth 1 --branch ${OLLAMA_VERSION} https://github.com/ollama/ollama.git
 
 # Build Ollama with Vulkan support
