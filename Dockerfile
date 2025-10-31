@@ -12,7 +12,12 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     ca-certificates \
+    rsync \
     && rm -rf /var/lib/apt/lists/*
+
+# Configure git (required for build process)
+RUN git config --global user.email "builder@ollama.local" && \
+    git config --global user.name "Ollama Builder"
 
 # Install Vulkan SDK
 RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc && \
