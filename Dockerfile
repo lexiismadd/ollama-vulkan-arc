@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     rsync \
+    ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure git (required for build process)
@@ -28,7 +29,6 @@ RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/
 
 # Set environment variables for build
 ENV CGO_ENABLED=1
-ENV LDFLAGS=-s
 ENV VULKAN_SDK=/usr
 
 # Clone Ollama repository
@@ -38,16 +38,8 @@ RUN git clone --depth 1 --branch ${OLLAMA_VERSION} https://github.com/ollama/oll
 
 # Build Ollama with Vulkan support
 WORKDIR /build/ollama
-RUN make -f Makefile.sync clean sync && \
-    cmake --preset CPU && \
-    cmake --build --parallel --preset CPU && \
-    cmake --install build --component CPU --strip && \
-    cmake --preset Vulkan && \
-    cmake --build --parallel --preset Vulkan && \
-    cmake --install build --component Vulkan --strip && \
-    source scripts/env.sh && \
-    mkdir -p dist/bin && \
-    go build -trimpath -buildmode=pie -o dist/bin/ollama .
+RUN go generate ./... && \
+    go build -trimpath -buildmode=pie -o ollama .
 
 # Stage 2: Runtime image
 FROM ubuntu:24.04
@@ -75,12 +67,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy built Ollama from builder stage
-COPY --from=builder /build/ollama/dist/bin/ollama /usr/local/bin/ollama
-COPY --from=builder /build/ollama/dist/lib/ollama /usr/local/lib/ollama
+COPY --from=builder /build/ollama/ollama /usr/local/bin/ollama
+COPY --from=builder /build/ollama/dist/lib /usr/local/lib/ollama
 
 # Set environment variables for Intel Arc GPU
 ENV PATH=/usr/local/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib/ollama:/usr/local/lib/ollama/vulkan
+ENV LD_LIBRARY_PATH=/usr/local/lib/ollama
 ENV OLLAMA_HOST=0.0.0.0:11434
 ENV OLLAMA_NUM_GPU=999
 ENV ZES_ENABLE_SYSMAN=1
