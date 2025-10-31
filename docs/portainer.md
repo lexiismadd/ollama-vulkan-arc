@@ -8,7 +8,7 @@
 
 2. **Build method:**
    - Select **Git Repository**
-   - Repository URL: `https://github.com/YOUR_USERNAME/ollama-vulkan-arc`
+   - Repository URL: `https://github.com/lexiismadd/ollama-vulkan-arc`
    - Repository reference: `refs/heads/main` (or your branch)
    - Compose path: `docker-compose.yml`
 
@@ -39,7 +39,7 @@
 
 1. **Prepare files locally:**
 ```bash
-   git clone https://github.com/YOUR_USERNAME/ollama-vulkan-arc
+   git clone https://github.com/lexiismadd/ollama-vulkan-arc
    cd ollama-vulkan-arc
    cp .env.example .env
    # Edit .env with your settings
@@ -164,7 +164,7 @@ Now you can deploy in Portainer:
 1. **Go to Portainer** → **Stacks** → **Add stack**
 2. **Stack name:** `ollama-vulkan-arc`
 3. **Build method:** Git Repository
-4. **Repository URL:** `https://github.com/YOUR_USERNAME/ollama-vulkan-arc`
+4. **Repository URL:** `https://github.com/lexiismadd/ollama-vulkan-arc`
 5. **Compose path:** `docker-compose.yml`
 6. **Add environment variables** or upload your `.env` file
 7. **Deploy!**

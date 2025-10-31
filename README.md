@@ -15,28 +15,28 @@ Docker setup for running Ollama with Vulkan acceleration on Intel Arc GPUs (test
 ### Using Docker Compose
 
 1. Clone this repository:
-\`\`\`bash
-git clone https://github.com/YOUR_USERNAME/ollama-vulkan-arc.git
+```
+git clone https://github.com/lexiismadd/ollama-vulkan-arc.git
 cd ollama-vulkan-arc
-\`\`\`
+```
 
 2. Copy and configure environment:
-\`\`\`bash
+```bash
 cp .env.example .env
 # Edit .env with your preferences
-\`\`\`
+```
 
 3. Build and start:
-\`\`\`bash
+```bash
 docker compose build
 docker compose up -d
-\`\`\`
+```
 
 4. Test:
-\`\`\`bash
+```bash
 docker exec ollama-vulkan-arc ollama pull llama3.2
 docker exec ollama-vulkan-arc ollama run llama3.2
-\`\`\`
+```
 
 ### Using Portainer
 
@@ -56,32 +56,32 @@ Edit `.env` file to customize:
 
 1. In Portainer, go to **Stacks** → **Add stack**
 2. Choose **Git Repository**
-3. Enter your repository URL: `https://github.com/YOUR_USERNAME/ollama-vulkan-arc`
+3. Enter your repository URL: `https://github.com/lexiismadd/ollama-vulkan-arc`
 4. Set **Compose path**: `docker-compose.yml`
 5. Add environment variables or upload your `.env` file
 6. Click **Deploy the stack**
 
-See [detailed Portainer instructions](docs/PORTAINER.md).
+See [detailed Portainer instructions](docs/portainer.md).
 
 ## Monitoring GPU Usage
 
-\`\`\`bash
+```bash
 # Install tools
 sudo apt install intel-gpu-tools
 
 # Monitor GPU
 sudo intel_gpu_top
-\`\`\`
+```
 
 ## Updating Ollama
 
 1. Edit `.env` and update `OLLAMA_VERSION`
 2. Rebuild:
-\`\`\`bash
+```bash
 docker compose down
 docker compose build --no-cache
 docker compose up -d
-\`\`\`
+```
 
 ## Troubleshooting
 
@@ -114,7 +114,7 @@ MIT License - feel free to use and modify.
 - [Ollama](https://github.com/ollama/ollama)
 - [Intel IPEX-LLM](https://github.com/intel/ipex-llm)
 - Vulkan support contributors
-\`\`\`
+```
 
 ## Step 4: Create Enhanced docker-compose.yml
 
@@ -181,7 +181,7 @@ volumes:
 
 ## Step 5: Add Portainer-Specific Documentation
 
-Create `docs/PORTAINER.md`:
+Create `docs/portainer.md`:
 ````markdown
 # Portainer Setup Guide
 
@@ -193,7 +193,7 @@ Create `docs/PORTAINER.md`:
 
 2. **Build method:**
    - Select **Git Repository**
-   - Repository URL: `https://github.com/YOUR_USERNAME/ollama-vulkan-arc`
+   - Repository URL: `https://github.com/lexiismadd/ollama-vulkan-arc`
    - Repository reference: `refs/heads/main` (or your branch)
    - Compose path: `docker-compose.yml`
 
@@ -224,7 +224,7 @@ Create `docs/PORTAINER.md`:
 
 1. **Prepare files locally:**
 ```bash
-   git clone https://github.com/YOUR_USERNAME/ollama-vulkan-arc
+   git clone https://github.com/lexiismadd/ollama-vulkan-arc
    cd ollama-vulkan-arc
    cp .env.example .env
    # Edit .env with your settings
@@ -349,7 +349,7 @@ Now you can deploy in Portainer:
 1. **Go to Portainer** → **Stacks** → **Add stack**
 2. **Stack name:** `ollama-vulkan-arc`
 3. **Build method:** Git Repository
-4. **Repository URL:** `https://github.com/YOUR_USERNAME/ollama-vulkan-arc`
+4. **Repository URL:** `https://github.com/lexiismadd/ollama-vulkan-arc`
 5. **Compose path:** `docker-compose.yml`
 6. **Add environment variables** or upload your `.env` file
 7. **Deploy!**
@@ -367,7 +367,7 @@ Now you can deploy in Portainer:
 3. In Portainer: **Pull and redeploy**
 
 ### To enable auto-updates:
-Set up GitHub webhook (see PORTAINER.md) so Portainer rebuilds when you push changes!
+Set up GitHub webhook (see portainer.md) so Portainer rebuilds when you push changes!
 
 ## Tips for Easy Management
 
