@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         # Update this to the latest Ollama version
-        OLLAMA_VERSION: v0.12.6
+        OLLAMA_VERSION: ${OLLAMA_VERSION:-v0.12.6}
     container_name: ollama-vulkan-arc
     restart: unless-stopped
     
@@ -15,7 +15,7 @@ services:
     
     # Ports
     ports:
-      - "11434:11434"
+      - "${OLLAMA_PORT:-11434}:11434"
     
     # Volumes for persistent model storage
     volumes:
@@ -23,17 +23,15 @@ services:
     
     # Environment variables for Intel Arc A770
     environment:
-      - OLLAMA_HOST=0.0.0.0:11434
-      - OLLAMA_NUM_GPU=999
-      - ZES_ENABLE_SYSMAN=1
-      # Optional: Set specific GPU if you have multiple
-      # - ONEAPI_DEVICE_SELECTOR=level_zero:0
-      # Optional: Adjust context window
-      # - OLLAMA_NUM_CTX=16384
+      - OLLAMA_HOST=${OLLAMA_HOST:-0.0.0.0:11434}
+      - OLLAMA_NUM_GPU=${OLLAMA_NUM_GPU:-999}
+      - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-16384}
+      - ZES_ENABLE_SYSMAN=${ZES_ENABLE_SYSMAN:-1}
+      - ONEAPI_DEVICE_SELECTOR=${ONEAPI_DEVICE_SELECTOR:-}
     
     # Resource limits (adjust based on your system)
-    mem_limit: 32g
-    shm_size: 16g
+    mem_limit: ${MEMORY_LIMIT:-32g}
+    shm_size: ${SHARED_MEMORY:-16g}
     
     # Healthcheck
     healthcheck:
@@ -48,8 +46,10 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
     restart: unless-stopped
+    profiles:
+      - webui
     ports:
-      - "8080:8080"
+      - "${WEBUI_PORT:-8080}:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
