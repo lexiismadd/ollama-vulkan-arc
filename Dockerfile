@@ -75,7 +75,7 @@ COPY --from=builder /build/ollama/dist/lib/ollama /usr/local/lib/ollama
 
 # Set environment variables for Intel Arc GPU
 ENV PATH=/usr/local/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib/ollama:/usr/local/lib/ollama/vulkan:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/lib/ollama:/usr/local/lib/ollama/vulkan
 ENV OLLAMA_HOST=0.0.0.0:11434
 ENV OLLAMA_NUM_GPU=999
 ENV ZES_ENABLE_SYSMAN=1
