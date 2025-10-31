@@ -117,7 +117,7 @@
    - Select: **Just the push event**
    - Click **Add webhook**
 
-Now when you push to GitHub, Portainer will auto-update!
+Now when a new version is pushed to GitHub, Portainer will auto-update!
 
 ## Troubleshooting in Portainer
 
@@ -140,54 +140,3 @@ Now when you push to GitHub, Portainer will auto-update!
 - Reduce `MEMORY_LIMIT` in environment variables
 - Reduce `SHARED_MEMORY`
 - Update stack to apply changes
-````
-
-## Step 6: Commit and Push
-````bash
-# Create .env from example
-cp .env.example .env
-
-# Add all files
-git add .
-
-# Commit
-git commit -m "Initial commit: Ollama with Vulkan support for Intel Arc"
-
-# Push to GitHub
-git push origin main
-````
-
-## Step 7: Deploy in Portainer
-
-Now you can deploy in Portainer:
-
-1. **Go to Portainer** → **Stacks** → **Add stack**
-2. **Stack name:** `ollama-vulkan-arc`
-3. **Build method:** Git Repository
-4. **Repository URL:** `https://github.com/lexiismadd/ollama-vulkan-arc`
-5. **Compose path:** `docker-compose.yml`
-6. **Add environment variables** or upload your `.env` file
-7. **Deploy!**
-
-## Making Modifications
-
-### To update Ollama version:
-1. Edit `.env` in your repo: `OLLAMA_VERSION=v0.13.0`
-2. Commit and push to GitHub
-3. In Portainer: Stack → **Pull and redeploy**
-
-### To change configuration:
-1. Edit `.env` or `docker-compose.yml`
-2. Commit and push
-3. In Portainer: **Pull and redeploy**
-
-### To enable auto-updates:
-Set up GitHub webhook (see portainer.md) so Portainer rebuilds when you push changes!
-
-## Tips for Easy Management
-
-1. **Use branches:** Create `dev` branch for testing changes
-2. **Tag releases:** Use git tags for stable versions
-3. **Document changes:** Update README.md with each modification
-4. **Test locally first:** Run `docker compose build` before pushing
-5. **Use .env:** Never hardcode values, always use environment variables
