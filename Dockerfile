@@ -1,59 +1,50 @@
-# Multi-stage build for Ollama with Vulkan support
-# Stage 1: Build Ollama with Vulkan
+# Simpler build from source approach
 FROM ubuntu:24.04 AS builder
 
-# Install build dependencies
+# Install all build dependencies
 RUN apt-get update && apt-get install -y \
     git \
     cmake \
     wget \
-    libcap-dev \
     golang-go \
     build-essential \
     curl \
     ca-certificates \
-    rsync \
-    ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
-# Configure git (required for build process)
+# Install Vulkan development files
+RUN apt-get update && apt-get install -y \
+    libvulkan-dev \
+    vulkan-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure git
 RUN git config --global user.email "builder@ollama.local" && \
     git config --global user.name "Ollama Builder"
 
-# Install Vulkan SDK
-RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc && \
-    wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list http://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list && \
-    apt-get update && \
-    apt-get install -y vulkan-sdk && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set environment variables for build
-ENV CGO_ENABLED=1
-ENV VULKAN_SDK=/usr
-
-# Clone Ollama repository
+# Clone Ollama
 WORKDIR /build
 ARG OLLAMA_VERSION=v0.12.7
 RUN git clone --depth 1 --branch ${OLLAMA_VERSION} https://github.com/ollama/ollama.git
 
-# Build Ollama with Vulkan support
+# Build Ollama
 WORKDIR /build/ollama
+ENV CGO_ENABLED=1
 RUN go generate ./... && \
-    go build -trimpath -buildmode=pie -o ollama .
+    go build -o ollama .
 
-# Stage 2: Runtime image
+# Runtime stage
 FROM ubuntu:24.04
 
-# Install runtime dependencies and Intel GPU drivers
+# Install runtime deps
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \
     wget \
     gnupg2 \
-    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Intel GPU repository and install drivers
+# Install Intel GPU drivers
 RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" | \
     tee /etc/apt/sources.list.d/intel-gpu-noble.list
@@ -66,23 +57,18 @@ RUN apt-get update && apt-get install -y \
     mesa-vulkan-drivers \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built Ollama from builder stage
+# Copy Ollama binary
 COPY --from=builder /build/ollama/ollama /usr/local/bin/ollama
-COPY --from=builder /build/ollama/dist/lib /usr/local/lib/ollama
 
-# Set environment variables for Intel Arc GPU
-ENV PATH=/usr/local/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib/ollama
+# Environment
 ENV OLLAMA_HOST=0.0.0.0:11434
 ENV OLLAMA_NUM_GPU=999
 ENV ZES_ENABLE_SYSMAN=1
 
-# Create directory for models
 RUN mkdir -p /root/.ollama
 
 WORKDIR /root
 EXPOSE 11434
 
-# Run Ollama server
 ENTRYPOINT ["/usr/local/bin/ollama"]
 CMD ["serve"]
